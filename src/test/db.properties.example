@@ -1,0 +1,3 @@
+db.url=jdbc:mysql://localhost:3306/Campuslands?useSSL=false&serverTimezone=America/Bogota&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+db.user=camper
+db.password=

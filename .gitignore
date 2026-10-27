@@ -1,0 +1,9 @@
+/db.properties
+/src/test/db.properties
+/build/
+/dist/
+/out/
+/nbproject/private/
+/invoices/
+/error_log.txt
+/materias_profesor_*_2025.txt
