@@ -1,2 +1,0 @@
-CREATE USER IF NOT EXISTS 'camper'@'localhost' IDENTIFIED BY 'CAMBIAR_CONTRASENA_LOCAL';
-GRANT SELECT ON Campuslands.* TO 'camper'@'localhost';
