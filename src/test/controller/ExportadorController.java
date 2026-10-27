@@ -43,15 +43,15 @@ public final class ExportadorController {
                 }
                 Optional<Profesor> resultado = profesores.buscarPorId(id);
                 if (resultado.isEmpty()) {
-                    vista.profesorNoEncontrado();
+                    vista.profesorNoEncontrado(id);
                     continue;
                 }
+                Profesor profesor = resultado.get();
                 List<MateriaAsignada> materias = profesores.buscarMaterias(id, ANIO_ACADEMICO);
                 if (materias.isEmpty()) {
-                    vista.sinMaterias();
+                    vista.sinMaterias(profesor);
                     return;
                 }
-                Profesor profesor = resultado.get();
                 Path archivo = directorio.resolve("materias_profesor_" + id + "_2025.txt");
                 try {
                     Files.writeString(archivo, crearReporte(profesor, materias),
@@ -71,16 +71,22 @@ public final class ExportadorController {
     private String crearReporte(Profesor profesor, List<MateriaAsignada> materias) {
         String salto = System.lineSeparator();
         StringBuilder reporte = new StringBuilder();
+        String dobleLinea = "=".repeat(50);
+        String linea = "-".repeat(50);
+        reporte.append(dobleLinea).append(salto);
         reporte.append("COLEGIO INTERNACIONAL \"LITTLE HORIZONS\"").append(salto);
-        reporte.append("REPORTE DE MATERIAS ASIGNADAS - AÑO 2025").append(salto).append(salto);
-        reporte.append("Nombre completo: ").append(profesor.nombreCompleto()).append(salto);
-        reporte.append("Documento: ").append(profesor.documento()).append(salto).append(salto);
+        reporte.append("REPORTE DE MATERIAS ASIGNADAS - AÑO 2025").append(salto);
+        reporte.append(dobleLinea).append(salto);
+        reporte.append("Nombre completo : ").append(profesor.nombreCompleto()).append(salto);
+        reporte.append("Documento       : ").append(profesor.documento()).append(salto);
+        reporte.append(linea).append(salto);
         reporte.append(String.format(Locale.ROOT, FORMATO_FILA, "Código", "Materia", "Grado"));
         for (MateriaAsignada materia : materias) {
             reporte.append(String.format(Locale.ROOT, FORMATO_FILA,
                     materia.codigo(), materia.nombre(), materia.grado()));
         }
-        reporte.append(salto).append("Documento generado el: ")
+        reporte.append(linea).append(salto);
+        reporte.append("Documento generado el: ")
                 .append(LocalDate.now(reloj).format(DateTimeFormatter.ofPattern("dd/MM/uuuu")))
                 .append(salto);
         return reporte.toString();

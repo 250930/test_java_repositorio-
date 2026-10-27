@@ -14,9 +14,12 @@ public final class ExportadorView {
         this.salida = salida;
     }
 
+    private static final String SEPARADOR = "=".repeat(50);
+
     public void mostrarTitulo() {
+        salida.println(SEPARADOR);
         salida.println("EXPORTADOR DE MATERIAS ASIGNADAS - AÑO 2025");
-        salida.println();
+        salida.println(SEPARADOR);
     }
 
     public Integer pedirId() {
@@ -28,22 +31,20 @@ public final class ExportadorView {
             }
             String texto = entrada.nextLine().strip();
             try {
-                if (!texto.matches("[0-9]+")) {
-                    throw new NumberFormatException();
-                }
                 return Integer.valueOf(texto);
             } catch (NumberFormatException e) {
-                salida.println("Error: Ingrese un número válido.");
+                salida.println("Error: Debe ingresar un número válido.");
             }
         }
     }
 
-    public void profesorNoEncontrado() {
-        salida.println("Error: No se encontró ningún profesor con ese número.");
+    public void profesorNoEncontrado(int id) {
+        salida.println("Error: No se encontró ningún profesor con el ID " + id + ".");
     }
 
-    public void sinMaterias() {
-        salida.println("El profesor no tiene materias asignadas en 2025.");
+    public void sinMaterias(Profesor profesor) {
+        salida.println("Error: El profesor " + profesor.nombreCompleto()
+                + " no tiene materias asignadas en 2025.");
     }
 
     public void exportacionExitosa(Profesor profesor, Path archivo) {

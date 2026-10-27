@@ -55,18 +55,24 @@ public final class ExportadorVerificacion {
 
     private static void verificarExportacion(Path directorio) throws Exception {
         DaoPrueba dao = new DaoPrueba(MATERIAS);
-        String salida = ejecutar("abc\n\n2147483648\n999\n1\n", dao, directorio);
-        exigir(salida.contains("Error: Ingrese un número válido."), "Entrada inválida");
-        exigir(salida.contains("Error: No se encontró ningún profesor con ese número."),
+        String salida = ejecutar("abc\n\n2147483648\n-5\n999\n1\n", dao, directorio);
+        exigir(salida.contains("=".repeat(50) + System.lineSeparator()
+                + "EXPORTADOR DE MATERIAS ASIGNADAS - AÑO 2025"), "Título");
+        exigir(salida.contains("Error: Debe ingresar un número válido."), "Entrada inválida");
+        exigir(salida.contains("Error: No se encontró ningún profesor con el ID 999."),
                 "Profesor inexistente");
+        exigir(salida.contains("Error: No se encontró ningún profesor con el ID -5."),
+                "ID negativo es entero");
         exigir(salida.contains("Archivo generado exitosamente."), "Confirmación");
         exigir(salida.contains("Profesor: Roberto Andrés Martínez Torres"), "Nombre en pantalla");
         exigir(salida.contains("Archivo: materias_profesor_1_2025.txt"), "Nombre del archivo");
         exigir(dao.anioConsultado == 2025, "Año académico fijo");
         Path archivo = directorio.resolve("materias_profesor_1_2025.txt");
         String contenido = Files.readString(archivo, StandardCharsets.UTF_8);
-        exigir(contenido.contains("Nombre completo: Roberto Andrés Martínez Torres"), "Nombre");
-        exigir(contenido.contains("Documento: CC 80123456"), "Documento");
+        exigir(contenido.startsWith("=".repeat(50)), "Línea de encabezado");
+        exigir(contenido.contains("Nombre completo : Roberto Andrés Martínez Torres"), "Nombre");
+        exigir(contenido.contains("Documento       : CC 80123456"), "Documento");
+        exigir(contenido.contains("-".repeat(50)), "Separador de tabla");
         exigir(contenido.contains("Documento generado el: 27/10/2026"), "Fecha de generación");
         exigir(contenido.contains("Física") && contenido.contains("Décimo"), "Tildes UTF-8");
         exigir(!contenido.contains("\t"), "Columnas sin tabuladores");
@@ -79,13 +85,14 @@ public final class ExportadorVerificacion {
         ejecutar("1\n", dao, directorio);
         exigir(Files.readString(archivo, StandardCharsets.UTF_8).equals(contenido),
                 "Reemplazo completo del archivo");
-        exigir(dao.busquedas == 3, "Repetir ID solo tras profesor inexistente");
+        exigir(dao.busquedas == 4, "Repetir ID solo tras profesor inexistente");
     }
 
     private static void verificarSinMaterias(Path directorio) throws Exception {
         DaoPrueba dao = new DaoPrueba(List.of());
         String salida = ejecutar("1\n1\n", dao, directorio);
-        exigir(salida.contains("El profesor no tiene materias asignadas en 2025."), "Sin materias");
+        exigir(salida.contains("Error: El profesor Roberto Andrés Martínez Torres "
+                + "no tiene materias asignadas en 2025."), "Sin materias");
         exigir(!Files.exists(directorio.resolve("materias_profesor_1_2025.txt")),
                 "No generar archivo vacío");
         exigir(dao.busquedas == 1, "Terminar cuando no hay materias");
